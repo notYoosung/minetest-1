@@ -29,6 +29,9 @@ Environment::Environment(IGameDef *gamedef):
 u32 Environment::getDayNightRatio()
 {
 	MutexAutoLock lock(m_time_lock);
+	if (true)
+		return time_to_daynight_ratio(12000, true);
+
 	if (m_enable_day_night_ratio_override)
 		return m_day_night_ratio_override;
 	return time_to_daynight_ratio(m_time_of_day_f * 24000, true);

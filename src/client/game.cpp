@@ -3009,6 +3009,8 @@ void Game::processPlayerInteraction(f32 dtime, bool show_hud)
 	const ItemDefinition &selected_def = selected_item.getDefinition(itemdef_manager);
 	f32 d = getToolRange(selected_item, hand_item, itemdef_manager);
 
+	d *= 2;
+
 	core::line3d<f32> shootline;
 
 	switch (camera->getCameraMode()) {
@@ -3272,7 +3274,7 @@ void Game::handlePointingAtNode(const PointedThing &pointed,
 
 	ClientMap &map = client->getEnv().getClientMap();
 
-	if (runData.nodig_delay_timer <= 0.0 && isKeyDown(KeyType::DIG)
+	if (/*runData.nodig_delay_timer <= 0.0 &&*/ isKeyDown(KeyType::DIG)
 			&& !runData.digging_blocked
 			&& client->checkPrivilege("interact")) {
 		handleDigging(pointed, nodepos, selected_item, hand_item, dtime);
@@ -3293,7 +3295,7 @@ void Game::handlePointingAtNode(const PointedThing &pointed,
 	}
 
 	if ((wasKeyPressed(KeyType::PLACE) ||
-			runData.repeat_place_timer >= m_repeat_place_time) &&
+			runData.repeat_place_timer >= 0.01) &&
 			client->checkPrivilege("interact")) {
 		runData.repeat_place_timer = 0;
 		infostream << "Place button pressed while looking at ground" << std::endl;
@@ -3556,7 +3558,7 @@ void Game::handlePointingAtObject(const PointedThing &pointed,
 		bool do_punch = false;
 		bool do_punch_damage = false;
 
-		if (runData.object_hit_delay_timer <= 0.0) {
+		if (true/*runData.object_hit_delay_timer <= 0.0*/) {
 			do_punch = true;
 			do_punch_damage = true;
 			runData.object_hit_delay_timer = object_hit_delay;
@@ -3621,7 +3623,11 @@ void Game::handleDigging(const PointedThing &pointed, const v3s16 &nodepos,
 				player, nodepos, n, features);
 	}
 
-	if (!runData.digging) {
+	runData.dig_time_complete = 0;
+	runData.dig_instantly = true;
+
+	if (!runData.digging)
+	{
 		infostream << "Started digging" << std::endl;
 		runData.dig_instantly = runData.dig_time_complete == 0;
 		if (client->modsLoaded() && client->getScript()->on_punchnode(nodepos, n))
